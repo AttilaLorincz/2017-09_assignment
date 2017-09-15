@@ -88,6 +88,60 @@ class TransferInsufficientBalanceTest extends FeatureTest {
   }
 }
 
+
+class TransferToNonExistingAccountTest extends FeatureTest {
+  override val server = new EmbeddedHttpServer(new WebApiServer)
+
+  "Transfer" should {
+    "return non existing account api error" in {
+      server.httpPost(
+        path = "/account",
+        postBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(Open(1))
+      )
+      server.httpPut(
+        path = "/account/1/deposit/8",
+        putBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(DepositCash(1, 8))
+      )
+      server.httpPut(
+        path = "/account/1/transfer/2/1",
+        putBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(ApiErrorResponseResult("No account exists with id: 2"))
+      )
+    }
+  }
+}
+
+class TransferFromNonExistingAccountTest extends FeatureTest {
+  override val server = new EmbeddedHttpServer(new WebApiServer)
+
+  "Transfer" should {
+    "return non existing account api error" in {
+      server.httpPost(
+        path = "/account",
+        postBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(Open(1))
+      )
+      server.httpPut(
+        path = "/account/1/deposit/8",
+        putBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(DepositCash(1, 8))
+      )
+      server.httpPut(
+        path = "/account/2/transfer/1/1",
+        putBody = "",
+        andExpect = Ok,
+        withJsonBody = JsonUtil.toJson(ApiErrorResponseResult("No account exists with id: 2"))
+      )
+    }
+  }
+}
 class TransferHistoryTest extends FeatureTest {
   override val server = new EmbeddedHttpServer(new WebApiServer)
   "Successful Transfer" should {
